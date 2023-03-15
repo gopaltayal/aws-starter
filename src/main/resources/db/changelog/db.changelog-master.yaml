@@ -1,0 +1,22 @@
+# Master Changelog File
+#
+# For each new migration (creation / deletion / update of a table),
+# create a separate file in the "db/migrations" directory.
+#
+# Please respect the following naming scheme:
+# "YYYY-MM-DD-HHMM-short-description-of-migration.yml"
+#
+# The migrations are only run, if they are explicitly included at the end of this file.
+# You can find an example of the file structure below:
+#
+# databaseChangeLog:
+#   - include:
+#       file: db/migrations/2020-12-07-1020-create-some-table.yml
+#   - include:
+#       file: db/migrations/2020-12-07-1645-create-another-table.yml
+#
+# Note: We don't use "includeAll" here in order to avoid migrations to be run accidentally.
+
+databaseChangeLog:
+  - include:
+      file: db/migrations/2023-03-15-1800-create-user-table.yml

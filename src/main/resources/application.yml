@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: aws-starter
+    version: 1.0.0
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:mysql://localhost:3306/aws-starter?serverTimezone=Europe/Rome&allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: aws-starter-pass
+    driver-class-name: com.mysql.cj.jdbc.Driver
