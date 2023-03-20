@@ -1,0 +1,6 @@
+# We needed this property to ensure DataJpaTests run in our tests.
+spring:
+  liquibase:
+    enabled: false
+  datasource:
+    driverClassName: org.h2.Driver

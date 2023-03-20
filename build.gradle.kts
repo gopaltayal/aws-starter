@@ -43,6 +43,7 @@ dependencies {
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mysql")
     testImplementation("org.mockito:mockito-core:5.2.0")
     testImplementation("com.h2database:h2:2.1.214")
 }
