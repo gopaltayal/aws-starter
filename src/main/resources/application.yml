@@ -12,3 +12,13 @@ spring:
     username: root
     password: aws-starter-pass
     driver-class-name: com.mysql.cj.jdbc.Driver
+---
+spring:
+  config:
+    activate:
+      on-profile: local-container
+  datasource:
+    url: jdbc:mysql://mysql-db:3306/aws-starter?serverTimezone=Europe/Rome&allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: aws-starter-pass
+    driver-class-name: com.mysql.cj.jdbc.Driver

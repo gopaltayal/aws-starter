@@ -23,6 +23,12 @@ These architectures will further be documented using best practices for document
 My suggestion would be to follow the project commit after commit to understand what was added at what step and complement it with the corresponding documentation.
 Please feel free to add comments on which aspect of it is unclear or what could be done to improve!
 
+## ADRs
+
+## C4 Model
+
+## AWS Diagram
+
 ## Local Setup
 1. Use the docker-compose.yml file to start the database.
 ```
@@ -36,9 +42,22 @@ docker-compose up -d
 docker-compose down
 ```
 
-## ADRs
-
-## C4 Model
-
-## AWS Diagram
-
+## Local Setup in Docker Container
+1. Start the Database using docker-compose, check the network created, as the docker container would need to be attached to it to access the database.
+2. Build JAR and Package in build/libs folder
+```
+./gradlew build -x test  
+```
+3. Build Local Image on Linux/Mac and start containers
+```
+docker buildx build --platform=linux/amd64 -t aws-starter-app .
+```
+4. Run the container, notice the network is attached and the port is bound before the image name!
+```
+docker run --network=aws-starter_default -e "SPRING_PROFILES_ACTIVE=local-container" -dp 8080:8080 aws-starter-app  
+```
+5. Check the application on [Local Swagger](http://localhost:8080/swagger-ui/index.html#/)
+6. Stop the container when done with the container ID
+```
+docker stop container_id
+```
