@@ -17,6 +17,15 @@ The *cdk.json* file tells the CDK Toolkit how to execute your app.
 2. Part of common infrastructure as it is passed down into other infrastructure stacks.
 3. Destroyed if `cdk destroy` is used.
 
+### VPC
+1. VPC for each environment you would like to create. Ex : VPC-Stage
+2. Part of Backend Infrastructure as it is specific for each environment.
+3. 1 Region -> 2 AZ -> 6 Subnets (3 in each AZ).
+    1. 2 Private subnets for the DB.
+    2. 2 Private subnets for application with NAT gateway (Security Best Practice)
+    3. 2 Public subnets for Nat Gateway (Redundant for High Availability)
+4. Destroyed if `cdk destroy` is used.
+
 ## Useful commands
 * `npm run build`   compile typescript to js
 * `npm run watch`   watch for changes and compile
