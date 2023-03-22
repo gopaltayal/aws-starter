@@ -13,7 +13,7 @@ build/
 .settings
 .springBeans
 .sts4-cache
-bin/
+!**/bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
@@ -38,3 +38,7 @@ out/
 
 ### APP-specific ###
 *.db
+
+infrastructure/node_modules
+infrastructure/cdk.out
+cdk.context.json
