@@ -30,7 +30,7 @@ Please feel free to add comments on which aspect of it is unclear or what could 
 - [ADR-003](/docs/adrs/003_why_mysql.md)
 - [ADR-004](/docs/adrs/004_liquibase_for_schema_management.md)
 - [ADR-005](/docs/adrs/005_test_containers.md)
-- [ADR-006](/docs/adrs/006_rds_aurora_mysql.md)
+- [ADR-006](/docs/adrs/006_rds_aurora_mysql_serverless.md)
 
 ## C4 Model
 
