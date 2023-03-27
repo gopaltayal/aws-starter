@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import {CommonInfrastructureStack} from '../lib/common-infrastructure-stack';
-import {BackendInfrastructureStack} from "../lib/backend-infrastructure-stack";
+import {CommonStack} from '../lib/common-stack';
+import {NetworkStack} from "../lib/network-stack";
+import {DatabaseStack} from "../lib/database-stack";
 
 export interface EnvOptions {
     // Name of the environment like stage/prod
@@ -12,7 +13,7 @@ export interface EnvOptions {
 }
 
 // External Parameters that will be needed by the infrastructure
-const stageEnv : EnvOptions = {
+const stageEnv: EnvOptions = {
     environmentName: "stage",
     vpcCidr: "10.1.0.0/16"
 }
@@ -32,5 +33,6 @@ const cdkOptions: cdk.StackProps = {
 };
 
 // The stacks that this application will stitch together
-const commonStack = new CommonInfrastructureStack(app, 'aws-starter-common-infra', cdkOptions);
-new BackendInfrastructureStack(app, 'aws-starter-backend-stage', stageEnv, commonStack, cdkOptions)
+const commonStack = new CommonStack(app, 'aws-starter-common-infra', cdkOptions);
+const networkStackStage = new NetworkStack(app, 'aws-starter-network-stage', stageEnv, cdkOptions);
+const databaseStackStage = new DatabaseStack(app, 'aws-starter-database-stage', stageEnv, networkStackStage, cdkOptions);

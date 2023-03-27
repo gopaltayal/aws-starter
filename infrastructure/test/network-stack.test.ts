@@ -1,18 +1,16 @@
 import * as cdk from 'aws-cdk-lib';
-import * as CommonInfrastructure from '../lib/common-infrastructure-stack';
-import * as BackendInfrastructure from '../lib/backend-infrastructure-stack';
+import * as BackendInfrastructure from '../lib/network-stack';
 import {Template} from "aws-cdk-lib/assertions";
 import {EnvOptions} from "../bin/infrastructure";
 
-test('Backend Infra creates VPC', () => {
+test('setup vpc infrastructure', () => {
     const app = new cdk.App();
-    const commonStack = new CommonInfrastructure.CommonInfrastructureStack(app, 'CommonStack');
     const envOptions: EnvOptions = {
         environmentName: "test",
         vpcCidr: "10.1.0.0/16"
     }
     // WHEN
-    const stack = new BackendInfrastructure.BackendInfrastructureStack(app, 'MyTestStack', envOptions, commonStack);
+    const stack = new BackendInfrastructure.NetworkStack(app, 'MyTestStack', envOptions);
     // THEN
     const template = Template.fromStack(stack);
     template.hasResourceProperties('AWS::EC2::VPC', {
@@ -72,34 +70,4 @@ test('Backend Infra creates VPC', () => {
     template.resourceCountIs("AWS::EC2::NatGateway", 2)
     template.resourceCountIs("AWS::EC2::InternetGateway", 1)
     template.resourceCountIs("AWS::EC2::VPCGatewayAttachment", 1)
-});
-
-test('Backend Infra creates RDS MySQL Aurora Serverless DB', () => {
-    const app = new cdk.App();
-    const commonStack = new CommonInfrastructure.CommonInfrastructureStack(app, 'CommonStack');
-    const envOptions: EnvOptions = {
-        environmentName: "test",
-        vpcCidr: "10.1.0.0/16"
-    }
-    // WHEN
-    const stack = new BackendInfrastructure.BackendInfrastructureStack(app, 'MyTestStack', envOptions, commonStack);
-    // THEN
-    const template = Template.fromStack(stack);
-    template.resourceCountIs("AWS::SecretsManager::Secret", 1)
-    template.hasResourceProperties('AWS::SecretsManager::SecretTargetAttachment', {
-        TargetType: "AWS::RDS::DBCluster"});
-    template.resourceCountIs("AWS::RDS::DBSubnetGroup", 1)
-    template.hasResourceProperties('AWS::EC2::SecurityGroup', {
-        GroupDescription: "RDS security group"});
-    template.hasResourceProperties('AWS::RDS::DBCluster', {
-        Engine: "aurora-mysql",
-        DBClusterParameterGroupName: "default.aurora-mysql5.7",
-        EnableHttpEndpoint: true,
-        EngineMode: "serverless",
-        EngineVersion: "5.7.mysql_aurora.2.08.2",
-        ScalingConfiguration: {
-            AutoPause: true,
-            MaxCapacity: 2,
-            MinCapacity: 2
-        }});
 });

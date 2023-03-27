@@ -1,7 +1,9 @@
 import {aws_ecr as ecr, RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 
-export class CommonInfrastructureStack extends Stack {
+export const NAME_ID_PREFIX = "aws-starter";
+
+export class CommonStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
 
@@ -10,8 +12,8 @@ export class CommonInfrastructureStack extends Stack {
     }
 
     private createEcrRepo() {
-        new ecr.Repository(this, 'aws-starter-repo', {
-            repositoryName: "aws-starter-repo",
+        new ecr.Repository(this, `${NAME_ID_PREFIX}-repo`, {
+            repositoryName: `${NAME_ID_PREFIX}-repo`,
             removalPolicy: RemovalPolicy.DESTROY
         });
     }

@@ -1,5 +1,4 @@
 import {
-    aws_ec2 as ec2,
     aws_rds as rds,
     aws_secretsmanager as secretsManager,
     RemovalPolicy,
@@ -8,8 +7,7 @@ import {
 } from 'aws-cdk-lib';
 import {Construct} from "constructs";
 import {EnvOptions} from "../bin/infrastructure";
-import {SubnetType, VpcProps} from "aws-cdk-lib/aws-ec2";
-import {CommonInfrastructureStack} from "./common-infrastructure-stack";
+import {SubnetType} from "aws-cdk-lib/aws-ec2";
 import {SecretProps} from "aws-cdk-lib/aws-secretsmanager";
 import {
     AuroraCapacityUnit,
@@ -19,54 +17,21 @@ import {
     ServerlessCluster,
     ServerlessClusterProps
 } from "aws-cdk-lib/aws-rds";
+import {NetworkStack} from "./network-stack";
+import {NAME_ID_PREFIX} from "./common-stack";
 
-const nameIdPrefix = "aws-starter"
-
-export class BackendInfrastructureStack extends Stack {
-    // Public as this VPC will be used further by elements across the stack
-    // In other scopes it could also be private or passed along as method return type and method argument to which ever component might need it for creation.
-    public vpc: ec2.Vpc;
+export class DatabaseStack extends Stack {
     private rds: rds.ServerlessCluster;
     private databaseSecret: secretsManager.Secret;
 
-    constructor(scope: Construct, id: string, envOptions: EnvOptions, commonStack: CommonInfrastructureStack, props?: StackProps) {
+    constructor(scope: Construct, id: string, envOptions: EnvOptions, networkStack: NetworkStack, props?: StackProps) {
         super(scope, id, props);
 
-        // Create a VPC with private and public subnets to hold the database, application and the NAT Gateway.
-        this.createVPC(envOptions)
-
         // Create a database with RDS with MySQL on Aurora
-        this.createDatabase(envOptions)
+        this.createDatabase(envOptions, networkStack)
     }
 
-    // Creates a VPC which spans 2 availability zones.
-    private createVPC(envOptions: EnvOptions) {
-        let vpcProps: VpcProps = {
-            cidr: envOptions.vpcCidr,
-            maxAzs: 2,
-            // This is per AZ
-            subnetConfiguration: [
-                {
-                    // Security Best Practice to communicate only via the NAT
-                    subnetType: SubnetType.PRIVATE_WITH_NAT,
-                    name: "private-application"
-                },
-                {
-                    subnetType: SubnetType.PRIVATE_ISOLATED,
-                    name: "private-database"
-                },
-                {
-                    subnetType: SubnetType.PUBLIC,
-                    name: "public-nat"
-                }
-            ],
-            // 1 Per AZ for high availability
-            natGateways: 2
-        }
-        this.vpc = new ec2.Vpc(this, `${nameIdPrefix}-vpc-${envOptions.environmentName}`, vpcProps)
-    }
-
-    private createDatabase(envOptions: EnvOptions) {
+    private createDatabase(envOptions: EnvOptions, networkStack: NetworkStack) {
         // Secrets Manager will manage the DB secret, and the applications will gain access to it via this secret
         let dbSecretProps: SecretProps = {
             generateSecretString: {
@@ -74,10 +39,11 @@ export class BackendInfrastructureStack extends Stack {
                 secretStringTemplate: JSON.stringify({username: `awsStarterAdmin`}),
                 generateStringKey: 'password',
                 passwordLength: 32,
+                // Only printable ASCII characters besides '/', '@', '"', ' ' may be used
                 excludeCharacters: '/@"\\'
             }
         }
-        this.databaseSecret = new secretsManager.Secret(this, `${nameIdPrefix}-db-secret-${envOptions.environmentName}`, dbSecretProps);
+        this.databaseSecret = new secretsManager.Secret(this, `${NAME_ID_PREFIX}-db-secret-${envOptions.environmentName}`, dbSecretProps);
 
         //  Actual DB cluster that will have eventual consistency
         let serverlessClusterProps: ServerlessClusterProps = {
@@ -87,7 +53,7 @@ export class BackendInfrastructureStack extends Stack {
             // This name can't contain '-' hence had to be named this way
             defaultDatabaseName: `awsStarterDb${envOptions.environmentName}`,
             removalPolicy: RemovalPolicy.DESTROY,
-            vpc: this.vpc,
+            vpc: networkStack.getVpc(),
             vpcSubnets: {subnetType: SubnetType.PRIVATE_ISOLATED, onePerAz: true},
             credentials: Credentials.fromSecret(this.databaseSecret),
             // Otherwise the minimum is 2 and maximum is 16 starts with 8 incurring costs
@@ -95,6 +61,6 @@ export class BackendInfrastructureStack extends Stack {
             // Allows you to connect via Query Editor and Data API, without bastion host
             enableDataApi: true
         }
-        this.rds = new ServerlessCluster(this, `${nameIdPrefix}-db-${envOptions.environmentName}`, serverlessClusterProps)
+        this.rds = new ServerlessCluster(this, `${NAME_ID_PREFIX}-db-${envOptions.environmentName}`, serverlessClusterProps)
     }
 }
