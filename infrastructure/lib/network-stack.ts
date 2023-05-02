@@ -2,17 +2,17 @@ import {
     aws_ec2 as ec2,
     Stack,
     StackProps
-} from 'aws-cdk-lib';
-import {Construct} from "constructs";
-import {EnvOptions} from "../bin/infrastructure";
-import {SubnetType, VpcProps} from "aws-cdk-lib/aws-ec2";
-import {NAME_ID_PREFIX} from "./common-stack";
+} from 'aws-cdk-lib'
+import {Construct} from "constructs"
+import {EnvOptions} from "../bin/infrastructure"
+import {SubnetType, VpcProps} from "aws-cdk-lib/aws-ec2"
+import {NAME_ID_PREFIX} from "./common-stack"
 
 export class NetworkStack extends Stack {
-    private vpc: ec2.Vpc;
+    private vpc: ec2.Vpc
 
     constructor(scope: Construct, id: string, envOptions: EnvOptions, props?: StackProps) {
-        super(scope, id, props);
+        super(scope, id, props)
 
         // Create a VPC with private and public subnets to hold the database, application and the NAT Gateway.
         this.createVPC(envOptions)
@@ -46,6 +46,6 @@ export class NetworkStack extends Stack {
     }
 
     public getVpc(){
-        return this.vpc;
+        return this.vpc
     }
 }

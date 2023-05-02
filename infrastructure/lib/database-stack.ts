@@ -4,11 +4,11 @@ import {
     RemovalPolicy,
     Stack,
     StackProps
-} from 'aws-cdk-lib';
-import {Construct} from "constructs";
-import {EnvOptions} from "../bin/infrastructure";
-import {SubnetType} from "aws-cdk-lib/aws-ec2";
-import {SecretProps} from "aws-cdk-lib/aws-secretsmanager";
+} from 'aws-cdk-lib'
+import {Construct} from "constructs"
+import {EnvOptions} from "../bin/infrastructure"
+import {SubnetType} from "aws-cdk-lib/aws-ec2"
+import {SecretProps} from "aws-cdk-lib/aws-secretsmanager"
 import {
     AuroraCapacityUnit,
     AuroraMysqlEngineVersion,
@@ -16,16 +16,16 @@ import {
     DatabaseClusterEngine,
     ServerlessCluster,
     ServerlessClusterProps
-} from "aws-cdk-lib/aws-rds";
-import {NetworkStack} from "./network-stack";
-import {NAME_ID_PREFIX} from "./common-stack";
+} from "aws-cdk-lib/aws-rds"
+import {NetworkStack} from "./network-stack"
+import {NAME_ID_PREFIX} from "./common-stack"
 
 export class DatabaseStack extends Stack {
-    private rds: rds.ServerlessCluster;
-    private databaseSecret: secretsManager.Secret;
+    private rds: rds.ServerlessCluster
+    private databaseSecret: secretsManager.Secret
 
     constructor(scope: Construct, id: string, envOptions: EnvOptions, networkStack: NetworkStack, props?: StackProps) {
-        super(scope, id, props);
+        super(scope, id, props)
 
         // Create a database with RDS with MySQL on Aurora
         this.createDatabase(envOptions, networkStack)
@@ -43,7 +43,7 @@ export class DatabaseStack extends Stack {
                 excludeCharacters: '/@"\\'
             }
         }
-        this.databaseSecret = new secretsManager.Secret(this, `${NAME_ID_PREFIX}-db-secret-${envOptions.environmentName}`, dbSecretProps);
+        this.databaseSecret = new secretsManager.Secret(this, `${NAME_ID_PREFIX}-db-secret-${envOptions.environmentName}`, dbSecretProps)
 
         //  Actual DB cluster that will have eventual consistency
         let serverlessClusterProps: ServerlessClusterProps = {
@@ -62,5 +62,13 @@ export class DatabaseStack extends Stack {
             enableDataApi: true
         }
         this.rds = new ServerlessCluster(this, `${NAME_ID_PREFIX}-db-${envOptions.environmentName}`, serverlessClusterProps)
+    }
+    
+    public getRds(){
+        return this.rds
+    }
+    
+    public getDatabaseSecret(){
+        return this.databaseSecret
     }
 }
